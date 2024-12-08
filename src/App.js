@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, UserPlus, Check, Filter } from 'lucide-react';
 import './App.css';
 
@@ -223,6 +223,53 @@ function App() {
   const [selectedParticipant, setSelectedParticipant] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
   const [activeFilter, setActiveFilter] = useState('all');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
+  const CORRECT_PASSWORD = 'connector';
+
+  // Check if user was previously authenticated
+  useEffect(() => {
+    const auth = localStorage.getItem('isAuthenticated');
+    if (auth === 'true') {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    if (password === CORRECT_PASSWORD) {
+      setIsAuthenticated(true);
+      localStorage.setItem('isAuthenticated', 'true');
+    } else {
+      alert('Falsches Passwort');
+    }
+  };
+
+  // If not authenticated, show login screen
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white rounded-lg shadow p-8">
+          <h1 className="text-2xl font-bold text-gray-800 mb-6">Toothletter Connector</h1>
+          <form onSubmit={handleLogin}>
+            <input
+              type="password"
+              placeholder="Passwort eingeben"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-2 border rounded-lg mb-4"
+            />
+            <button
+              type="submit"
+              className="w-full bg-blue-500 text-white py-2 rounded-lg"
+            >
+              Login
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   const findMatches = (participant) => {
     return participants.filter(p => 
